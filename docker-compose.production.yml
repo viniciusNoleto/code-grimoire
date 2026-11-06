@@ -1,0 +1,22 @@
+services:
+  code-grimoire:
+    container_name: code-grimoire
+    user: node
+    restart: unless-stopped
+    tty: true
+    build:
+      dockerfile: ./configs/docker/node/Dockerfile.deploy
+    # Sem porta publicada: o Nginx Proxy Manager alcança o container pela rede dele
+    # (Forward Hostname code-grimoire, porta 3000). Domínio e HTTPS ficam no NPM.
+    networks:
+      - code-grimoire-network
+      - proxy
+
+networks:
+  code-grimoire-network:
+    name: code-grimoire-network
+    driver: bridge
+  # Rede do Nginx Proxy Manager (já existe no servidor; `docker network ls` mostra o nome).
+  proxy:
+    name: ${PROXY_NETWORK:-nginx-proxy-manager}
+    external: true

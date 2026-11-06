@@ -1,0 +1,20 @@
+services:
+  code-grimoire:
+    container_name: code-grimoire
+    user: node
+    restart: unless-stopped
+    tty: true
+    build:
+      dockerfile: ./configs/docker/node/Dockerfile.local
+    env_file: .env
+    volumes:
+      - ./:/app/
+    ports:
+      - ${APP_PORT:-3000}:3000
+    networks:
+      - code-grimoire-network
+
+networks:
+  code-grimoire-network:
+    name: code-grimoire-network
+    driver: bridge

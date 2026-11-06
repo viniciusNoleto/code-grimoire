@@ -1,0 +1,17 @@
+# Nuxt
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+node_modules
+logs
+*.log
+.env
+.env.*
+!.env.example
+
+# ferramentas locais
+.taste-skill
+.DS_Store
