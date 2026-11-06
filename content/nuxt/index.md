@@ -1,7 +1,7 @@
 ---
 title: "Nuxt"
 description: "O framework em volta do Vue: renderização no servidor e hidratação, rotas por arquivo, busca de dados ciente de SSR e um servidor próprio, o Nitro."
-order: 2
+order: 4
 spell: "acid"
 cover: "#8fd957"      # cor da lombada na capa do grimório
 color: "#3b7a12"       # cor do texto no tema claro

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // Um capítulo dentro da página contínua do framework.
-import { useIntersectionObserver } from '@vueuse/core'
 
 const props = defineProps<{ doc: any, number: number }>()
 const slug = slugOf(props.doc.path)
@@ -18,23 +17,16 @@ provide('sectionNumber', (id?: string) => {
   const i = sections.value.findIndex(s => s.id === id)
   return i < 0 ? '' : `${props.number}.${i + 1}`
 })
-
-// o traço sob o título é "escrito" quando o capítulo chega à tela
-const sectionEl = useTemplateRef<HTMLElement>('section')
-const seen = ref(false)
-const { stop } = useIntersectionObserver(sectionEl, ([e]) => {
-  if (e?.isIntersecting) { seen.value = true; stop() }
-}, { threshold: 0.05 })
 </script>
 
 <template>
-  <section :id="slug" ref="section" data-chapter class="scroll-mt-2 pt-13">
-    <span v-if="number > 1" class="ornament mx-auto mt-1.5 mb-9 block h-4 w-16 opacity-60" aria-hidden="true" />
-    <div
-      class="relative mb-3.5 flex items-baseline gap-3.5 pb-2.5 after:absolute after:inset-x-0 after:-bottom-px after:h-px after:origin-left after:bg-linear-to-r after:from-tome after:to-border after:to-35% after:transition-transform after:duration-1100 after:ease-grimoire"
-      :class="seen ? 'after:scale-x-100' : 'js:motion-safe:after:scale-x-0'"
-    >
-      <span class="font-mono text-[.85rem] text-tome">{{ pad(number) }}</span>
+  <!-- o fleurão fica no meio, 36px de cada lado: a margem de cima colapsa com a do
+       último parágrafo do capítulo anterior, então a seção não leva padding -->
+  <section :id="slug" data-chapter class="scroll-mt-2" :class="number > 1 ? '' : 'pt-4'">
+    <span v-if="number > 1" class="ornament mx-auto my-9 block h-4 w-16 opacity-60" aria-hidden="true" />
+    <!-- traço sob o título: o começo na cor do tomo, o resto discreto -->
+    <div class="relative mb-3.5 flex items-baseline gap-3.5 border-b border-border pb-2.5 after:absolute after:-bottom-px after:left-0 after:h-0.5 after:w-14 after:bg-tome">
+      <span class="text-[.9rem] text-tome tabular-nums">{{ pad(number) }}</span>
       <h2 class="m-0 font-display text-[clamp(1.55rem,3.4vw,2.05rem)] leading-[1.1] font-extrabold tracking-[-.02em] text-balance [&_code]:text-[.8em]">
         {{ doc.title }}
       </h2>
@@ -44,8 +36,8 @@ const { stop } = useIntersectionObserver(sectionEl, ([e]) => {
         v-for="(s, i) in sections"
         :key="s.id"
         :href="`#${slug}-${s.id}`"
-        class="inline-flex max-w-full items-baseline gap-1.5 rounded-full border border-border bg-card px-[9px] py-1 text-[.8rem] leading-[1.3] text-muted-foreground no-underline transition hover:border-tome hover:text-foreground hover:shadow-[0_0_0_3px_color-mix(in_srgb,var(--tome)_14%,transparent)]"
-      ><span class="font-mono text-[.7rem] text-tome">{{ number }}.{{ i + 1 }}</span>{{ s.text }}</a>
+        class="inline-flex max-w-full items-baseline gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 text-[.8rem] leading-[1.3] text-muted-foreground no-underline hover:border-tome hover:text-foreground"
+      ><span class="text-[.74rem] text-tome tabular-nums">{{ number }}.{{ i + 1 }}</span>{{ s.text }}</a>
     </nav>
     <ContentRenderer :value="doc" />
   </section>

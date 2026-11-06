@@ -48,11 +48,10 @@ const numbers = computed(() => {
 
 const hasSql = computed(() => (docs.value ?? []).some(d => JSON.stringify(d.body).includes('line sql')))
 
-// título com a última palavra na cor do framework, como nas artifacts
-const titleParts = (t: string) => {
-  const i = t.lastIndexOf(' ')
-  return i < 0 ? ['', t] : [t.slice(0, i + 1), t.slice(i + 1)]
-}
+// a posição do framework no sumário vira o número do tomo (Tomo I, Tomo II…)
+const position = computed(() => tree.value.findIndex(d => d.path === division.value!.path) + 1)
+const { open: openSearch } = useSearch()
+const { toggle: toggleTheme } = useTheme()
 
 useHead({
   htmlAttrs: {
@@ -77,32 +76,49 @@ onBeforeUnmount(() => observers.forEach(o => o.disconnect()))
 </script>
 
 <template>
-  <div class="mx-auto grid max-w-[1240px] grid-cols-[264px_minmax(0,1fr)] gap-10 pr-[max(16px,env(safe-area-inset-right))] pb-16 pl-[max(16px,env(safe-area-inset-left))] max-book:grid-cols-[minmax(0,1fr)] max-book:gap-0">
+  <div class="mx-auto grid max-w-[1240px] grid-cols-[264px_minmax(0,1fr)] gap-10 pr-[max(16px,env(safe-area-inset-right))] pb-16 pl-[max(16px,env(safe-area-inset-left))] max-book:grid-cols-[minmax(0,1fr)] max-book:gap-0 max-book:pr-[max(10px,env(safe-area-inset-right))] max-book:pl-[max(10px,env(safe-area-inset-left))]">
     <Sidebar :division="division!" :tomes="sidebarTomes" :active="active" :has-sql="hasSql" :numbers="numbers" />
 
     <main id="top" class="min-w-0">
-      <!-- a folha do livro aberto: lombada à esquerda, papel com grão, páginas empilhadas à direita e a fita marcadora -->
+      <!-- no celular, a sidebar dá lugar a uma barra curta; capítulos e tomos ficam no marcador
+           e a busca fica no rodapé fixo, ao alcance em qualquer ponto da leitura -->
+      <div class="hidden items-center gap-1 pt-1 pr-14 max-book:flex">
+        <NuxtLink to="/" class="-ml-1 inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-[.9rem] text-muted-foreground no-underline hover:text-foreground">
+          <Icon name="lucide:book-open" class="size-[18px]" /> Sumário
+        </NuxtLink>
+        <button type="button" class="ml-auto grid size-11 place-items-center rounded-md text-muted-foreground hover:bg-tome-soft hover:text-foreground" aria-label="Alternar tema claro e escuro" @click="toggleTheme">
+          <Icon name="lucide:moon" class="size-[19px]" />
+        </button>
+      </div>
+
+      <!-- a folha do livro aberto: lombada à esquerda, papel com grão e páginas empilhadas à direita -->
       <div
         id="content"
-        class="paper-grain stacked-pages relative mt-6 mr-2 origin-left rounded-[3px_10px_10px_3px] px-[clamp(20px,5vw,64px)] pt-2 pb-18 before:ribbon-clip before:absolute before:-top-1.5 before:right-12 before:h-18 before:w-[18px] before:bg-tome before:opacity-90 js:motion-safe:animate-open-page max-book:mt-4 max-book:mr-1.5 max-book:px-[18px] max-book:before:right-6 max-book:before:h-13"
+        class="paper-grain stacked-pages relative mt-6 mr-2 rounded-[3px_10px_10px_3px] px-[clamp(20px,5vw,64px)] pt-2 pb-18 max-book:mt-0.5 max-book:mr-1.5 max-book:px-4"
       >
         <template v-for="(t, ti) in tomes" :key="t.id">
-          <header :id="t.id" class="pt-14 pb-7 max-book:pt-6">
-            <div class="font-mono text-[.74rem] tracking-[.14em] text-tome uppercase">
-              {{ division!.title }}<template v-if="t.doc.version">
-                · {{ t.doc.version }}
-              </template>
+          <!-- a abertura do tomo, como a de um capítulo de livro -->
+          <header :id="t.id" class="pt-12 pb-5 max-book:pt-6">
+            <div class="flex items-center gap-4">
+              <Glyph :spell="division!.spell" class="size-[clamp(40px,5vw,56px)] shrink-0 text-tome" />
+              <p class="m-0 font-book text-[clamp(1.05rem,2vw,1.25rem)] leading-snug text-tome italic">
+                Tomo {{ toRoman(position) }}<template v-if="t.doc.version">
+                  · {{ t.doc.version }}
+                </template>
+              </p>
             </div>
             <component
               :is="ti === 0 ? 'h1' : 'h2'"
-              class="mt-2.5 mb-4 font-display text-[clamp(2.4rem,6vw,3.8rem)] leading-[1.02] font-extrabold tracking-[-.03em] text-balance"
+              class="mt-3 mb-3 font-book text-[clamp(2.1rem,5.4vw,3.5rem)] leading-[1] font-normal tracking-[-.015em] text-balance text-foreground"
             >
-              {{ titleParts(t.doc.title)[0] }}<em class="text-tome not-italic">{{ titleParts(t.doc.title)[1] }}</em>
+              {{ t.doc.title }}
             </component>
-            <ContentRenderer :value="t.doc" class="m-0 max-w-[62ch] text-[1.02rem] text-muted-foreground" />
-            <!-- fleurão: separa tomos e capítulos como num livro impresso -->
-            <div class="mt-7 flex items-center gap-3.5 before:h-px before:flex-1 before:bg-linear-to-r before:from-transparent before:via-border before:to-transparent after:h-px after:flex-1 after:bg-linear-to-r after:from-transparent after:via-border after:to-transparent" aria-hidden="true">
+            <ContentRenderer :value="t.doc" class="m-0 max-w-[62ch] text-[1.02rem] text-foreground" />
+            <!-- fleurão na magia do tomo: separa a abertura dos capítulos -->
+            <div class="mt-9 flex items-center gap-3.5" aria-hidden="true">
+              <span class="h-px flex-1 bg-border" />
               <span class="ornament block h-4 w-16" />
+              <span class="h-px flex-1 bg-border" />
             </div>
           </header>
 
@@ -115,8 +131,21 @@ onBeforeUnmount(() => observers.forEach(o => o.disconnect()))
       </div>
     </main>
   </div>
-  <a
-    class="fixed right-[max(16px,env(safe-area-inset-right))] bottom-[calc(16px+env(safe-area-inset-bottom))] z-20 rounded-full border border-border bg-card px-[13px] py-[7px] text-[.8rem] font-medium text-foreground no-underline hover:border-tome"
-    href="#top"
-  ><Icon name="lucide:arrow-up" class="-mt-0.5 mr-1 inline size-3.5 align-middle" />Topo</a>
+
+  <Bookmark :division="division!" :tomes="sidebarTomes" :active="active" :has-sql="hasSql" />
+
+  <!-- rodapé fixo: busca (no celular) e volta ao topo -->
+  <div class="fixed right-[max(12px,env(safe-area-inset-right))] bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 flex gap-1.5">
+    <button
+      type="button"
+      class="hidden min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-4 text-[.85rem] font-medium text-foreground hover:border-tome max-book:inline-flex"
+      @click="openSearch"
+    >
+      <Icon name="lucide:search" class="size-4" />Buscar
+    </button>
+    <a
+      class="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-4 text-[.85rem] font-medium text-foreground no-underline hover:border-tome"
+      href="#top"
+    ><Icon name="lucide:arrow-up" class="size-4" />Topo</a>
+  </div>
 </template>

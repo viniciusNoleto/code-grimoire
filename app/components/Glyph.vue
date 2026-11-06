@@ -5,15 +5,14 @@
   brasas (brasas, Laravel) raio cortando colchetes angulares (raio, Web) e o cilindro do banco talhado em pedra, com uma rachadura (rocha, SQL). Sem magia, é o sigilo do próprio grimório: <0>,
   com o zero desenhado como um olho.
 
-  Todos os traços têm pathLength="1": com a prop `trace` o glifo é escrito
-  traço a traço, o anel primeiro (animação `trace` em app/assets/css/tailwind.css).
+  O glifo é sempre estático: a magia fica no desenho, sem movimento.
 -->
 <script setup lang="ts">
 import type { Spell } from '~/utils/spells'
 
 const props = withDefaults(
-  defineProps<{ spell?: Spell, ring?: boolean, trace?: boolean, weight?: number }>(),
-  { ring: true, trace: false, weight: 1.7 },
+  defineProps<{ spell?: Spell, ring?: boolean, weight?: number }>(),
+  { ring: true, weight: 1.7 },
 )
 
 // cristal de gelo: seis braços com um galho em V perto da ponta
@@ -79,9 +78,6 @@ const STROKES: Record<Spell | 'grimoire', string[]> = {
 }
 
 const strokes = computed(() => STROKES[props.spell ?? 'grimoire'])
-const strokeClass = computed(() => (props.trace ? 'motion-safe:animate-trace motion-safe:[stroke-dasharray:1_1]' : undefined))
-// cada traço começa 110 ms depois do anterior
-const delay = (i: number) => ({ animationDelay: `${(i + (props.ring ? 1 : 0)) * 110}ms` })
 </script>
 
 <template>
@@ -91,7 +87,7 @@ const delay = (i: number) => ({ animationDelay: `${(i + (props.ring ? 1 : 0)) * 
     viewBox="-24 -24 48 48"
     aria-hidden="true"
   >
-    <circle v-if="ring" :class="strokeClass" :style="{ strokeWidth: weight * 0.76 }" r="22" pathLength="1" />
-    <path v-for="(d, i) in strokes" :key="i" :class="strokeClass" :style="delay(i)" :d="d" pathLength="1" />
+    <circle v-if="ring" :style="{ strokeWidth: weight * 0.76 }" r="22" />
+    <path v-for="(d, i) in strokes" :key="i" :d="d" />
   </svg>
 </template>

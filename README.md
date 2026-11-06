@@ -44,7 +44,7 @@ content/
   laravel/laravel-por-dentro/01.ciclo-de-vida.md → um capítulo
   react/…
 app/pages/[division]/index.vue             → a página contínua de cada framework
-app/assets/css/tailwind.css                → tokens do Tailwind v4 (cores, fontes, animações); o visual fica nos componentes
+app/assets/css/tailwind.css                → tokens do Tailwind v4 (cores, fontes); o visual fica nos componentes
 shiki/sql-lines.ts                         → as linhas de SQL gerado nos blocos PHP
 ```
 
@@ -68,7 +68,7 @@ colorDark: "#6cc795"  # cor do texto no tema escuro
 ---
 ```
 
-A cor pinta tudo daquele framework: título, números, links e marcador da folha. A magia (`spell`) dá o efeito do clique e o ornamento entre capítulos dentro do tomo (`app/utils/spells.ts`).
+A cor pinta tudo daquele framework: título, números, links e marcador da folha. A magia (`spell`) dá o glifo do tomo e o fleurão que separa tomos e capítulos (`app/utils/spells.ts`).
 
 ### Um novo tomo (guia) dentro do framework
 
@@ -189,4 +189,4 @@ Há duas buscas, e nenhuma precisa de cadastro: o índice (`/search.json`) é ge
 
 ## O visual
 
-A base é o layout das duas artifacts originais: índice fixo à esquerda, coluna de leitura, capítulos numerados, notas, código com o SQL em faixa própria, tabelas e bancadas. Por cima dela vem a camada de grimório: a leitura numa folha de livro (lombada, papel com grão, páginas empilhadas, fita marcadora) e ornamentos entre capítulos. A página inicial é o grimório aberto: a folha de rosto à esquerda e, à direita, o índice dos tomos, cada um com o seu glifo (`app/components/Glyph.vue`), desenhado da magia do framework. Apontar um tomo invoca o glifo dele no círculo da página ao lado. Cada framework tem uma magia: plantas (Vue), ácido (Nuxt), gelo (React), fumaça (Next), brasas (Laravel), raio (Web) e rocha (SQL). Dentro do tomo, o clique solta essa magia e as separações entre capítulos usam o ornamento dela; fora dos tomos, o clique solta o anel de runas. Os efeitos só rodam enquanto há partículas vivas. Com "reduzir movimento" ligado no sistema, nada disso anima.
+A base é o layout das duas artifacts originais: índice fixo à esquerda, coluna de leitura, capítulos numerados, notas, código com o SQL em faixa própria, tabelas e bancadas. Por cima dela vem a camada de grimório, estática (sem efeitos de clique, para a leitura ficar leve; a única animação elaborada é a capa abrindo): a leitura numa folha de livro (lombada, papel com grão, páginas empilhadas) e fleurões entre capítulos. Quando o site é aberto direto em `/`, a página inicial começa com o livro fechado, a capa de couro com o título em ouro; ao clicar, a capa gira na lombada e surge a primeira folha, com a folha de rosto e o sumário, com cada framework apresentado como um tomo (Tomo I, Tomo II…), o seu glifo (`app/components/Glyph.vue`), a descrição e os grupos de capítulos. Cada framework tem uma magia: plantas (Vue), ácido (Nuxt), gelo (React), fumaça (Next), brasas (Laravel), raio (Web) e rocha (SQL); ela aparece só no desenho do glifo e do fleurão. Chegando ao início vindo de outra página, o livro já está aberto no sumário. Em telas estreitas, onde o índice lateral não cabe, o marcador (a fita no alto, `app/components/Bookmark.vue`) abre pela esquerda um painel com os capítulos do tomo e os outros tomos, e a busca fica no rodapé fixo, ao lado do Topo.

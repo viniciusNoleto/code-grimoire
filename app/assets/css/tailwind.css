@@ -1,7 +1,7 @@
 /* =====================================================================
    Grimório de código · Tailwind CSS v4
    Os componentes usam utilitários do Tailwind; aqui ficam só os tokens
-   (cores, fontes, animações), as variantes do projeto e o pouco de base
+   (cores, fontes), as variantes do projeto e o pouco de base
    que não cabe numa classe (barras de rolagem, ornamentos em SVG).
 
    A cor de cada framework vem do frontmatter (color / colorDark) e chega
@@ -9,6 +9,7 @@
    --tome é a cor efetiva (clara ou escura) e vira as classes *-tome.
    ===================================================================== */
 @import "tailwindcss";
+/* só para o deslize do painel do marcador (sheet do shadcn-vue) */
 @import "tw-animate-css";
 
 /* a raiz do Vite é app/; as linhas de SQL têm classes definidas em shiki/ */
@@ -165,31 +166,12 @@
   @keyframes accordion-down { from { height: 0; } to { height: var(--reka-accordion-content-height); } }
   @keyframes accordion-up { from { height: var(--reka-accordion-content-height); } to { height: 0; } }
 
-  /* a folha do tomo abre a partir da lombada */
-  --animate-open-page: open-page .9s var(--ease-grimoire) both;
-  @keyframes open-page {
-    from { opacity: 0; transform: perspective(1400px) rotateY(-14deg) translateX(-12px); }
-    to { opacity: 1; transform: none; }
-  }
-  /* as páginas da capa descem da lombada */
-  --animate-open-verso: open-verso 1s var(--ease-grimoire) backwards;
-  --animate-open-recto: open-recto 1s var(--ease-grimoire) backwards;
-  @keyframes open-verso { from { opacity: 0; transform: perspective(1800px) rotateY(24deg); } }
-  @keyframes open-recto { from { opacity: 0; transform: perspective(1800px) rotateY(-24deg); } }
-  --animate-rise: rise .7s var(--ease-grimoire) backwards;
-  @keyframes rise { from { opacity: 0; transform: translateY(16px); } }
-  --animate-drop-ribbon: drop-ribbon .9s .9s var(--ease-grimoire) backwards;
-  @keyframes drop-ribbon { from { transform: scaleY(.2); } }
-  --animate-revolve: revolve 24s linear infinite;
-  @keyframes revolve { to { transform: rotate(360deg); } }
-  /* o glifo é escrito traço a traço */
-  --animate-trace: trace .7s var(--ease-grimoire) backwards;
-  @keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
-  /* faíscas do clique (plugins/spells.client.ts) */
-  --animate-ring: ring .7s var(--ease-grimoire) forwards;
-  @keyframes ring { from { transform: scale(.2) rotate(-60deg); opacity: 1; } to { transform: scale(1.15) rotate(30deg); opacity: 0; } }
-  --animate-spark: spark .62s var(--ease-grimoire) forwards;
-  @keyframes spark { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
+  /* a única animação elaborada do site: o livro abrindo na página inicial.
+     A capa gira na lombada (transição em pages/index.vue) e então a folha surge. */
+  --ease-book: cubic-bezier(.55, .05, .25, 1);
+  --animate-page-in: page-in .38s var(--ease-grimoire) both;
+  @keyframes page-in { from { opacity: 0; transform: scale(.985); } }
+
   /* caixa que acabou de renderizar (bancadas "Quem renderiza?") */
   --animate-flash: flash .7s ease-out;
   @keyframes flash { from { background-color: #fdf0d4; border-color: var(--color-warning); } }
@@ -205,10 +187,9 @@
 @utility stacked-pages {
   box-shadow:
     1px 0 0 var(--border), 4px 2px 0 -1px var(--background), 4px 2px 0 0 var(--border),
-    8px 4px 0 -1px var(--background), 8px 4px 0 0 var(--border),
-    0 24px 60px -32px var(--page-shadow);
+    8px 4px 0 -1px var(--background), 8px 4px 0 0 var(--border);
 }
-/* o ornamento entre tomos e capítulos: o desenho muda com a magia do tomo */
+/* o fleurão entre tomos e capítulos: o desenho vem da magia do bloco [data-spell] mais próximo */
 @utility ornament {
   background-color: var(--tome);
   mask: var(--motif) center / contain no-repeat;
@@ -225,18 +206,17 @@
     --scroll-thumb: color-mix(in srgb, var(--muted-foreground) 38%, transparent);
     --scroll-thumb-active: color-mix(in srgb, var(--tome) 70%, transparent);
   }
-  :root[data-spell="plants"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M4 9c9-3 18-3 28-1s19 2 28-1' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M13 8.4c.6-4 3.6-6.4 7.4-6.4-.8 3.4-3.4 6-7.4 6.4Z'/%3E%3Cpath d='M23 8.6c.6 4 3.6 6.4 7.4 6.4-.8-3.4-3.4-6-7.4-6.4Z'/%3E%3Cpath d='M51 8.4c-.6-4-3.6-6.4-7.4-6.4.8 3.4 3.4 6 7.4 6.4Z'/%3E%3Cpath d='M41 8.6c-.6 4-3.6 6.4-7.4 6.4.8-3.4 3.4-6 7.4-6.4Z'/%3E%3Ccircle cx='32' cy='8.3' r='2.2'/%3E%3C/svg%3E"); }
-  :root[data-spell="acid"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M32 1.5c3 4 5 6.5 5 9a5 5 0 0 1-10 0c0-2.5 2-5 5-9Z'/%3E%3Cpath d='M20 5c2 2.6 3 4.2 3 5.8a3 3 0 0 1-6 0c0-1.6 1-3.2 3-5.8Z'/%3E%3Cpath d='M44 5c2 2.6 3 4.2 3 5.8a3 3 0 0 1-6 0c0-1.6 1-3.2 3-5.8Z'/%3E%3Ccircle cx='10' cy='10' r='1.6'/%3E%3Ccircle cx='54' cy='10' r='1.6'/%3E%3Ccircle cx='5' cy='6' r='1'/%3E%3Ccircle cx='59' cy='6' r='1'/%3E%3C/svg%3E"); }
-  :root[data-spell="ice"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M32 1v14M25.9 4.5l12.2 7M25.9 11.5l12.2-7'/%3E%3Cpath d='M30 2.6 32 4.4 34 2.6M30 13.4 32 11.6 34 13.4'/%3E%3C/g%3E%3Cpath d='M6 8 21 6.6 24 8 21 9.4Z'/%3E%3Cpath d='M58 8 43 6.6 40 8 43 9.4Z'/%3E%3C/svg%3E"); }
-  :root[data-spell="smoke"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M3 11c6 0 7-6 13-6s7 6 13 6c3.5 0 5-2 6.5-4M61 5c-6 0-7 6-13 6-3.4 0-5-1.6-6.4-3.6' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
-  :root[data-spell="embers"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M32 1c1 3 5 5 5 9.5a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-.5-5 1-8Z'/%3E%3Ccircle cx='21' cy='11' r='1.7'/%3E%3Ccircle cx='43' cy='11' r='1.7'/%3E%3Ccircle cx='14' cy='8' r='1.1'/%3E%3Ccircle cx='50' cy='8' r='1.1'/%3E%3Ccircle cx='8' cy='11' r='.8'/%3E%3Ccircle cx='56' cy='11' r='.8'/%3E%3C/svg%3E"); }
-  :root[data-spell="lightning"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M34 .5 27 9h4.5L29 15.5 37 6.5h-4.5L35 .5Z'/%3E%3Cpath d='M4 8h5l2-3 3 6 2-3h6M60 8h-5l-2 3-3-6-2 3h-6' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-  :root[data-spell="rock"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M26.5 12.5 28 5.5l4.5-3 5 2.5 1 6.5-4 3.5h-6.5Z'/%3E%3Cpath d='M15 13l1-4.5 3.5-1.5 3 2-.5 4Z'/%3E%3Cpath d='M42 13l.5-4 3-2 3.5 1.5 1 4.5Z'/%3E%3Cpath d='M5 13.5l1.5-3 2.5.5.5 2.5Z'/%3E%3Cpath d='M55 13.5l.5-2.5 2.5-.5 1.5 3Z'/%3E%3C/svg%3E"); }
+  [data-spell="plants"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M4 9c9-3 18-3 28-1s19 2 28-1' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round'/%3E%3Cpath d='M13 8.4c.6-4 3.6-6.4 7.4-6.4-.8 3.4-3.4 6-7.4 6.4Z'/%3E%3Cpath d='M23 8.6c.6 4 3.6 6.4 7.4 6.4-.8-3.4-3.4-6-7.4-6.4Z'/%3E%3Cpath d='M51 8.4c-.6-4-3.6-6.4-7.4-6.4.8 3.4 3.4 6 7.4 6.4Z'/%3E%3Cpath d='M41 8.6c-.6 4-3.6 6.4-7.4 6.4.8-3.4 3.4-6 7.4-6.4Z'/%3E%3Ccircle cx='32' cy='8.3' r='2.2'/%3E%3C/svg%3E"); }
+  [data-spell="acid"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M32 1.5c3 4 5 6.5 5 9a5 5 0 0 1-10 0c0-2.5 2-5 5-9Z'/%3E%3Cpath d='M20 5c2 2.6 3 4.2 3 5.8a3 3 0 0 1-6 0c0-1.6 1-3.2 3-5.8Z'/%3E%3Cpath d='M44 5c2 2.6 3 4.2 3 5.8a3 3 0 0 1-6 0c0-1.6 1-3.2 3-5.8Z'/%3E%3Ccircle cx='10' cy='10' r='1.6'/%3E%3Ccircle cx='54' cy='10' r='1.6'/%3E%3Ccircle cx='5' cy='6' r='1'/%3E%3Ccircle cx='59' cy='6' r='1'/%3E%3C/svg%3E"); }
+  [data-spell="ice"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M32 1v14M25.9 4.5l12.2 7M25.9 11.5l12.2-7'/%3E%3Cpath d='M30 2.6 32 4.4 34 2.6M30 13.4 32 11.6 34 13.4'/%3E%3C/g%3E%3Cpath d='M6 8 21 6.6 24 8 21 9.4Z'/%3E%3Cpath d='M58 8 43 6.6 40 8 43 9.4Z'/%3E%3C/svg%3E"); }
+  [data-spell="smoke"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M3 11c6 0 7-6 13-6s7 6 13 6c3.5 0 5-2 6.5-4M61 5c-6 0-7 6-13 6-3.4 0-5-1.6-6.4-3.6' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
+  [data-spell="embers"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M32 1c1 3 5 5 5 9.5a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-.5-5 1-8Z'/%3E%3Ccircle cx='21' cy='11' r='1.7'/%3E%3Ccircle cx='43' cy='11' r='1.7'/%3E%3Ccircle cx='14' cy='8' r='1.1'/%3E%3Ccircle cx='50' cy='8' r='1.1'/%3E%3Ccircle cx='8' cy='11' r='.8'/%3E%3Ccircle cx='56' cy='11' r='.8'/%3E%3C/svg%3E"); }
+  [data-spell="lightning"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M34 .5 27 9h4.5L29 15.5 37 6.5h-4.5L35 .5Z'/%3E%3Cpath d='M4 8h5l2-3 3 6 2-3h6M60 8h-5l-2 3-3-6-2 3h-6' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  [data-spell="rock"] { --motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16'%3E%3Cpath d='M26.5 12.5 28 5.5l4.5-3 5 2.5 1 6.5-4 3.5h-6.5Z'/%3E%3Cpath d='M15 13l1-4.5 3.5-1.5 3 2-.5 4Z'/%3E%3Cpath d='M42 13l.5-4 3-2 3.5 1.5 1 4.5Z'/%3E%3Cpath d='M5 13.5l1.5-3 2.5.5.5 2.5Z'/%3E%3Cpath d='M55 13.5l.5-2.5 2.5-.5 1.5 3Z'/%3E%3C/svg%3E"); }
 
   html {
     scroll-padding-top: 12px;
     scrollbar-color: var(--scroll-thumb) var(--desk);
-    @media (prefers-reduced-motion: no-preference) { scroll-behavior: smooth; }
   }
   body {
     @apply bg-paper text-foreground antialiased;

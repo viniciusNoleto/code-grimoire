@@ -1,7 +1,7 @@
 ---
 title: "Vue"
 description: "Como a reatividade do Vue rastreia dependências e decide o que renderizar de novo, e uma referência de toda a API nativa, com bancadas que rodam Vue de verdade."
-order: 1
+order: 2
 spell: "plants"
 cover: "#1f4a33"      # cor da lombada na capa do grimório
 color: "#1f6b45"       # cor do texto no tema claro
