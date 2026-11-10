@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // O marcador: a fita presa no alto da folha, só em telas estreitas (nas largas
 // o índice lateral fica sempre à vista). Abre, pela esquerda, um painel com os
-// capítulos do tomo (marcando onde a leitura está) e os outros tomos.
+// capítulos do tomo (marcando o capítulo aberto) e os outros tomos.
 import type { SidebarChapter, SidebarTome } from '~/components/Sidebar.vue'
 import type { Division } from '~/composables/useTree'
 import { Button } from '~/components/ui/button'
@@ -16,7 +16,6 @@ const props = defineProps<{
   hasSql: boolean
 }>()
 
-const router = useRouter()
 const { data: tree } = useTree()
 const { open: openSearch } = useSearch()
 const { isVisible: sqlVisible, toggle: toggleSql } = useSql()
@@ -35,17 +34,13 @@ watch(isOpen, async (open) => {
   if (!open) return
   tab.value = 'chapters'
   await nextTick()
-  list.value?.querySelector('[aria-current="location"]')?.scrollIntoView({ block: 'center' })
+  list.value?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'center' })
 })
 
-// fecha o painel e só então rola até o capítulo (com o painel aberto a página não rola)
-async function goTo(id: string) {
+// cada capítulo é uma página: fecha o painel e navega
+function goTo(id: string) {
   isOpen.value = false
-  await nextTick()
-  requestAnimationFrame(() => {
-    router.replace({ hash: `#${id}` })
-    document.getElementById(id)?.scrollIntoView()
-  })
+  navigateTo(`${props.division.path}/${id}`)
 }
 function search() {
   isOpen.value = false
@@ -109,10 +104,10 @@ function search() {
                 <ul class="m-0 grid list-none p-0">
                   <li v-for="c in g.chapters" :key="c.id">
                     <a
-                      :href="`#${c.id}`"
+                      :href="`${division.path}/${c.id}`"
                       class="grid min-h-10 grid-cols-[26px_1fr] items-center rounded-md px-2 py-1 text-[.9rem] leading-[1.3] no-underline"
                       :class="active === c.id ? 'bg-tome-soft font-medium text-foreground' : 'text-foreground hover:bg-tome-soft'"
-                      :aria-current="active === c.id ? 'location' : undefined"
+                      :aria-current="active === c.id ? 'page' : undefined"
                       @click.prevent="goTo(c.id)"
                     ><span class="text-[.8rem] text-tome tabular-nums">{{ c.number }}</span>{{ c.title }}</a>
                   </li>

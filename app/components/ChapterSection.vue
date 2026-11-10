@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Um capítulo dentro da página contínua do framework.
+// Um capítulo: título, atalhos para as seções e o corpo (cada capítulo tem página própria).
 
 const props = defineProps<{ doc: any, number: number }>()
 const slug = slugOf(props.doc.path)
@@ -20,10 +20,7 @@ provide('sectionNumber', (id?: string) => {
 </script>
 
 <template>
-  <!-- o fleurão fica no meio, 36px de cada lado: a margem de cima colapsa com a do
-       último parágrafo do capítulo anterior, então a seção não leva padding -->
-  <section :id="slug" data-chapter class="scroll-mt-2" :class="number > 1 ? '' : 'pt-4'">
-    <span v-if="number > 1" class="ornament mx-auto my-9 block h-4 w-16 opacity-60" aria-hidden="true" />
+  <section :id="slug" data-chapter class="scroll-mt-2 pt-4">
     <!-- traço sob o título: o começo na cor do tomo, o resto discreto -->
     <div class="relative mb-3.5 flex items-baseline gap-3.5 border-b border-border pb-2.5 after:absolute after:-bottom-px after:left-0 after:h-0.5 after:w-14 after:bg-tome">
       <span class="text-[.9rem] text-tome tabular-nums">{{ pad(number) }}</span>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Na página contínua, cada título ganha o capítulo como prefixo no id,
-// para não colidir com títulos iguais de outros capítulos.
+// Cada título ganha o capítulo como prefixo no id (os links "#capitulo-secao"
+// do conteúdo dependem disso para achar a página do capítulo).
 const props = defineProps<{ id?: string }>()
 const chapter = inject<string>('chapter', '')
 const prefixedId = computed(() => (props.id ? (chapter ? `${chapter}-${props.id}` : props.id) : undefined))

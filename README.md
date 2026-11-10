@@ -1,6 +1,6 @@
 # Grimório de código
 
-Meu agregador de conhecimento: o que eu estudo de cada tecnologia, escrito como referência. Cada framework (Laravel, React…) é lido numa **página contínua**, do primeiro ao último capítulo, com o índice lateral acompanhando onde a leitura está. Não existe painel nem formulário: todo o conteúdo mora no repositório, em Markdown, e o site é gerado estático.
+Meu agregador de conhecimento: o que eu estudo de cada tecnologia, escrito como referência. Cada framework (Laravel, React…) tem uma abertura com o sumário e **uma página por capítulo**, com o índice lateral marcando o capítulo aberto. Não existe painel nem formulário: todo o conteúdo mora no repositório, em Markdown, e o site é gerado estático.
 
 Feito com Nuxt 4 e Nuxt Content 3.
 
@@ -43,12 +43,13 @@ content/
   laravel/laravel-por-dentro/index.md      → a abertura de um tomo (um guia)
   laravel/laravel-por-dentro/01.ciclo-de-vida.md → um capítulo
   react/…
-app/pages/[division]/index.vue             → a página contínua de cada framework
+app/pages/[division]/index.vue             → a abertura de cada framework (tomos e sumário)
+app/pages/[division]/[chapter].vue         → a página de um capítulo
 app/assets/css/tailwind.css                → tokens do Tailwind v4 (cores, fontes); o visual fica nos componentes
 shiki/sql-lines.ts                         → as linhas de SQL gerado nos blocos PHP
 ```
 
-O número no começo do nome do capítulo (`01.`, `02.`…) define a ordem. Cada capítulo vira uma seção da página do framework, com o endereço `/<framework>#<nome-do-arquivo-sem-número>`, por exemplo `/laravel#recuperar-registros`.
+O número no começo do nome do capítulo (`01.`, `02.`…) define a ordem. Cada capítulo vira uma página, com o endereço `/<framework>/<nome-do-arquivo-sem-número>`, por exemplo `/laravel/recuperar-registros`. Nos capítulos, link para uma seção com `#<capitulo>-<id-do-titulo>` (ou `/<outro-framework>#<capitulo>-<id>`): o site resolve para a página do capítulo.
 
 ## Adicionar conhecimento
 

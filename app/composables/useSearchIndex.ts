@@ -2,7 +2,7 @@
  * Índice de busca compartilhado (busca global e busca do índice lateral).
  * Carregado uma vez, sob demanda, de /search.json (gerado no build).
  */
-export interface SearchSection { id: string, title: string, location: string, division: string, level: number, content: string }
+export interface SearchSection { id: string, number: string, title: string, location: string, division: string, level: number, content: string }
 export interface IndexedSection extends SearchSection { nTitle: string, nLocation: string, nContent: string }
 export interface SearchHit { section: IndexedSection, excerpt: { before: string, match: string, after: string } | null }
 

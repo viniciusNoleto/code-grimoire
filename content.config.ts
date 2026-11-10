@@ -7,8 +7,8 @@ import { defineCollection, defineContentConfig, z } from '@nuxt/content'
  *   content/<framework>/<tomo>/index.md          → a abertura de um tomo (guia)
  *   content/<framework>/<tomo>/NN.<capitulo>.md  → um capítulo (NN dá a ordem)
  *
- * Cada framework é lido numa página contínua: /<framework>, com todos os
- * tomos e capítulos em sequência e o índice lateral acompanhando a leitura.
+ * Cada framework tem uma abertura (/<framework>, com o sumário) e uma página
+ * por capítulo (/<framework>/<capitulo>), com o índice lateral marcando o capítulo aberto.
  */
 export default defineContentConfig({
   collections: {

@@ -23,13 +23,35 @@ export interface Division extends TreeNode { tomes: Tome[] }
 
 const segments = (p: string) => p.split('/').filter(Boolean)
 
-/** Último trecho do caminho: é o id da seção na página contínua. */
+/** Último trecho do caminho: é o id do capítulo (e o prefixo dos ids das suas seções). */
 export const slugOf = (path: string) => segments(path).at(-1) ?? ''
 
-/** Endereço de um tomo ou capítulo dentro da página contínua do framework. */
+/** Endereço de um framework, tomo ou capítulo: capítulos têm página própria (/laravel/rotas). */
 export const anchorOf = (path: string) => {
   const p = segments(path)
-  return p.length <= 1 ? `/${p[0] ?? ''}` : `/${p[0]}#${p.at(-1)}`
+  if (p.length <= 1) return `/${p[0] ?? ''}`
+  return p.length === 2 ? `/${p[0]}` : `/${p[0]}/${p.at(-1)}`
+}
+
+/**
+ * Converte um link do conteúdo em endereço de página.
+ * Os capítulos citam seções como "#capitulo-secao" (mesmo framework) ou
+ * "/web#capitulo-secao" (outro framework); o capítulo é o slug que prefixa o hash.
+ */
+export function resolveContentLink(href: string, currentDivision: string, tree: Division[]) {
+  const m = href.match(/^(?:\/([\w-]+))?#(.+)$/)
+  if (!m) return href
+  const divisionSlug = m[1] ?? currentDivision
+  const hash = m[2]!
+  const division = tree.find(d => d.path === `/${divisionSlug}`)
+  if (!division) return href
+  if (division.tomes.some(t => slugOf(t.path) === hash)) return `/${divisionSlug}`
+  const chapter = division.tomes
+    .flatMap(t => t.chapters.map(c => slugOf(c.path)))
+    .filter(c => hash === c || hash.startsWith(c + '-'))
+    .sort((a, b) => b.length - a.length)[0]
+  if (!chapter) return href
+  return `/${divisionSlug}/${chapter}${hash === chapter ? '' : '#' + hash}`
 }
 
 export function useTree() {
