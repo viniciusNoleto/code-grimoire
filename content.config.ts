@@ -29,7 +29,7 @@ export default defineContentConfig({
         /** Posição do framework na capa e nas listas (frameworks). */
         order: z.number().optional(),
         /** Magia tema do framework: dá o desenho do glifo e do fleurão (frameworks). */
-        spell: z.enum(['plants', 'acid', 'ice', 'smoke', 'embers', 'lightning', 'rock']).optional(),
+        spell: z.enum(['plants', 'acid', 'ice', 'smoke', 'embers', 'lightning', 'rock', 'wind']).optional(),
         /** Cor da lombada do framework na capa do grimório (frameworks). */
         cover: z.string().optional(),
         /** Nota de fontes ao fim do tomo (tomos). */

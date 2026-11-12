@@ -4,6 +4,9 @@ services:
     user: node
     restart: unless-stopped
     tty: true
+    # O CI/CD publica a imagem no ghcr.io e define APP_IMAGE/APP_TAG no deploy.
+    # Sem elas (make build/up manual), compila aqui mesmo com o Dockerfile.deploy.
+    image: ${APP_IMAGE:-code-grimoire}:${APP_TAG:-latest}
     build:
       dockerfile: ./configs/docker/node/Dockerfile.deploy
     # Sem porta publicada: o Nginx Proxy Manager alcança o container pela rede dele

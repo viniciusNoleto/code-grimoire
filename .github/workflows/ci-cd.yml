@@ -1,0 +1,115 @@
+# CI: todo PR e todo push compilam a imagem de produção (se o build quebrar, o check fica vermelho).
+# CD: push na main publica a imagem no GitHub Container Registry e troca o container no servidor via SSH.
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch: # botão "Run workflow" na aba Actions (redeploy manual)
+
+# um deploy por vez; um push novo na mesma branch cancela o build antigo, mas nunca um deploy em andamento
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # publicar no ghcr.io
+    outputs:
+      image: ${{ steps.vars.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # nome da imagem precisa ser minúsculo: ghcr.io/<dono>/<repo>
+      - id: vars
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login no ghcr.io
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # PR: só compila. main: compila e publica com as tags "latest" e "sha-<commit>"
+      - name: Build (e push na main)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: configs/docker/node/Dockerfile.deploy
+          push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+          tags: |
+            ${{ steps.vars.outputs.image }}:latest
+            ${{ steps.vars.outputs.image }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production # secrets do servidor ficam neste environment (Settings → Environments)
+    permissions:
+      contents: read
+      packages: read # o token deste job é usado pelo servidor para baixar a imagem
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      IMAGE: ${{ needs.build.outputs.image }}
+      TAG: sha-${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<EOF
+          Host server
+            HostName $SSH_HOST
+            User $SSH_USER
+            Port $SSH_PORT
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+          EOF
+
+      # o servidor só precisa do compose; o .env (APP_ENV, PROXY_NETWORK) já fica lá
+      - name: Enviar docker-compose.production.yml
+        run: |
+          # shellcheck disable=SC2029 # expansão no runner é intencional
+          ssh server "mkdir -p '$DEPLOY_PATH'"
+          scp docker-compose.production.yml "server:$DEPLOY_PATH/docker-compose.production.yml"
+
+      - name: Baixar a imagem e trocar o container
+        run: |
+          # login temporário no ghcr.io com o token do job (vale só enquanto o job roda)
+          echo "${{ secrets.GITHUB_TOKEN }}" | ssh server "docker login ghcr.io -u '${{ github.actor }}' --password-stdin"
+          # shellcheck disable=SC2087 # variáveis expandidas no runner antes de ir ao servidor
+          ssh server bash -s <<EOF
+          set -euo pipefail
+          cd '$DEPLOY_PATH'
+          export APP_IMAGE='$IMAGE' APP_TAG='$TAG'
+          trap 'docker logout ghcr.io >/dev/null' EXIT
+          docker compose -f docker-compose.production.yml pull code-grimoire
+          docker compose -f docker-compose.production.yml up -d --no-deps code-grimoire
+          sleep 5
+          test "\$(docker inspect -f '{{.State.Running}}' code-grimoire)" = true
+          docker image prune -f >/dev/null
+          echo "Deploy de $TAG concluído."
+          EOF

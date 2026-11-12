@@ -51,7 +51,7 @@ onBeforeUnmount(() => {
 useHead({ bodyAttrs: { class: 'bg-desk' } })
 useSeoMeta({
   title: 'Grimório de código',
-  description: 'O grimório de código de Vinícius Nolêto: a plataforma web, Vue, React, Nuxt, Next.js, SQL e Laravel estudados por dentro, como referência contínua.',
+  description: 'O grimório de código de Vinícius Nolêto: a plataforma web, Vue, React, Nuxt, Next.js, SQL, Laravel e Go estudados por dentro, como referência contínua.',
 })
 </script>
 
@@ -106,7 +106,7 @@ useSeoMeta({
                 de Vinícius Nolêto
               </p>
               <p class="mt-[7%] mb-0 max-w-[24ch] text-[clamp(.8rem,min(2.9vw,2.1svh),.95rem)] leading-[1.45] text-gold/80">
-                A plataforma web, Vue, React, Nuxt, Next.js, SQL e Laravel, estudados por dentro
+                A plataforma web, Vue, React, Nuxt, Next.js, SQL, Laravel e Go, estudados por dentro
               </p>
             </div>
             <!-- a capa inteira é o botão; o texto fica no pé da moldura -->

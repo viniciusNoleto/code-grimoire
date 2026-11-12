@@ -33,7 +33,27 @@ make install           # imagem, npm install no container e sobe em http://local
 2. `make install` (ou `make build && make up`).
 3. No NPM, um Proxy Host: o domínio → scheme `http`, forward hostname `code-grimoire`, porta `3000`. Na aba SSL, peça o certificado Let's Encrypt e ligue *Force SSL*.
 
-Conteúdo novo: `git pull && make update-build` compila o site de novo e troca o container.
+Conteúdo novo: basta dar push na `main` (veja CI/CD abaixo). À mão, `git pull && make update-build` compila o site no servidor e troca o container.
+
+### CI/CD (GitHub Actions)
+
+`.github/workflows/ci-cd.yml`:
+
+- **PR ou push**: compila a imagem de produção. Se o build quebrar, o check fica vermelho.
+- **Push na `main`** (ou *Run workflow* na aba Actions): publica a imagem em `ghcr.io/viniciusnoleto/code-grimoire` (tags `latest` e `sha-<commit>`), copia o `docker-compose.production.yml` para o servidor por SSH, baixa a imagem e troca o container.
+
+Secrets do environment `production` (Settings → Environments → production):
+
+| Secret | Valor |
+|---|---|
+| `SSH_HOST` | IP do servidor |
+| `SSH_PORT` | porta do SSH (opcional, padrão 22) |
+| `SSH_USER` | usuário de deploy (no grupo `docker`) |
+| `SSH_PRIVATE_KEY` | chave privada que o Actions usa para entrar |
+| `SSH_KNOWN_HOSTS` | saída de `ssh-keyscan -p <porta> <ip>` |
+| `DEPLOY_PATH` | pasta no servidor com o `.env` (ex.: `/home/deploy/code-grimoire`) |
+
+Rollback: no servidor, `APP_IMAGE=ghcr.io/viniciusnoleto/code-grimoire APP_TAG=sha-<commit-bom> docker compose -f docker-compose.production.yml up -d`.
 
 ## Onde fica cada coisa
 
@@ -62,7 +82,7 @@ Crie `content/<framework>/index.md`. Ele aparece sozinho na capa (como uma lomba
 title: "Vue"
 description: "Uma frase sobre o que este framework guarda."
 order: 1              # posição na capa e nas listas
-spell: "plants"       # plants, acid, ice, smoke, embers, lightning ou rock
+spell: "plants"       # plants, acid, ice, smoke, embers, lightning, rock ou wind
 cover: "#1f4a33"      # cor da lombada na capa do grimório
 color: "#1f6b45"      # cor do texto no tema claro
 colorDark: "#6cc795"  # cor do texto no tema escuro
@@ -190,4 +210,4 @@ Há duas buscas, e nenhuma precisa de cadastro: o índice (`/search.json`) é ge
 
 ## O visual
 
-A base é o layout das duas artifacts originais: índice fixo à esquerda, coluna de leitura, capítulos numerados, notas, código com o SQL em faixa própria, tabelas e bancadas. Por cima dela vem a camada de grimório, estática (sem efeitos de clique, para a leitura ficar leve; a única animação elaborada é a capa abrindo): a leitura numa folha de livro (lombada, papel com grão, páginas empilhadas) e fleurões entre capítulos. Quando o site é aberto direto em `/`, a página inicial começa com o livro fechado, a capa de couro com o título em ouro; ao clicar, a capa gira na lombada e surge a primeira folha, com a folha de rosto e o sumário, com cada framework apresentado como um tomo (Tomo I, Tomo II…), o seu glifo (`app/components/Glyph.vue`), a descrição e os grupos de capítulos. Cada framework tem uma magia: plantas (Vue), ácido (Nuxt), gelo (React), fumaça (Next), brasas (Laravel), raio (Web) e rocha (SQL); ela aparece só no desenho do glifo e do fleurão. Chegando ao início vindo de outra página, o livro já está aberto no sumário. Em telas estreitas, onde o índice lateral não cabe, o marcador (a fita no alto, `app/components/Bookmark.vue`) abre pela esquerda um painel com os capítulos do tomo e os outros tomos, e a busca fica no rodapé fixo, ao lado do Topo.
+A base é o layout das duas artifacts originais: índice fixo à esquerda, coluna de leitura, capítulos numerados, notas, código com o SQL em faixa própria, tabelas e bancadas. Por cima dela vem a camada de grimório, estática (sem efeitos de clique, para a leitura ficar leve; a única animação elaborada é a capa abrindo): a leitura numa folha de livro (lombada, papel com grão, páginas empilhadas) e fleurões entre capítulos. Quando o site é aberto direto em `/`, a página inicial começa com o livro fechado, a capa de couro com o título em ouro; ao clicar, a capa gira na lombada e surge a primeira folha, com a folha de rosto e o sumário, com cada framework apresentado como um tomo (Tomo I, Tomo II…), o seu glifo (`app/components/Glyph.vue`), a descrição e os grupos de capítulos. Cada framework tem uma magia: plantas (Vue), ácido (Nuxt), gelo (React), fumaça (Next), brasas (Laravel), raio (Web), rocha (SQL) e vento (Go); ela aparece só no desenho do glifo e do fleurão. Chegando ao início vindo de outra página, o livro já está aberto no sumário. Em telas estreitas, onde o índice lateral não cabe, o marcador (a fita no alto, `app/components/Bookmark.vue`) abre pela esquerda um painel com os capítulos do tomo e os outros tomos, e a busca fica no rodapé fixo, ao lado do Topo.

@@ -74,7 +74,7 @@ export default defineNuxtConfig({
         toc: { depth: 4, searchDepth: 4 },
         highlight: {
           theme: { default: grimoireTheme },
-          langs: ['php', 'sql', 'js', 'jsx', 'ts', 'tsx', 'json', 'bash', 'vue', 'html', 'css', 'http', 'nginx', 'ini'],
+          langs: ['php', 'sql', 'js', 'jsx', 'ts', 'tsx', 'json', 'bash', 'vue', 'html', 'css', 'http', 'nginx', 'ini', 'go'],
         },
       },
     },

@@ -2,7 +2,7 @@
   O glifo de cada tomo, desenhado a partir da magia do framework:
   folha sobre o V (plantas, Vue), gota no monte (ácido, Nuxt), cristal de
   seis braços (gelo, React), N que solta fumaça (fumaça, Next) e chama com
-  brasas (brasas, Laravel) raio cortando colchetes angulares (raio, Web) e o cilindro do banco talhado em pedra, com uma rachadura (rocha, SQL). Sem magia, é o sigilo do próprio grimório: <0>,
+  brasas (brasas, Laravel) raio cortando colchetes angulares (raio, Web) e o cilindro do banco talhado em pedra, com uma rachadura (rocha, SQL) e três rajadas que se enrolam na ponta (vento, Go). Sem magia, é o sigilo do próprio grimório: <0>,
   com o zero desenhado como um olho.
 
   O glifo é sempre estático: a magia fica no desenho, sem movimento.
@@ -67,6 +67,11 @@ const STROKES: Record<Spell | 'grimoire', string[]> = {
     'M-13 -10 V10 C-13 15.5 13 15.5 13 10 V-10',
     'M-13 0 C-13 5.5 13 5.5 13 0',
     'M3 -5.2 L0.5 -1 L4 2.5 L1.5 7',
+  ],
+  wind: [
+    'M-17 -7 H5 C10 -7 12.5 -10.5 10.5 -13.5 C8.5 -16.5 3.5 -15.5 4 -11.5',
+    'M-12 1 H11 C15.5 1 17.5 4.5 15.5 7.5 C13.5 10.5 8.5 9.5 9.5 6',
+    'M-17 9 H-2 C2 9 4 12.5 2 15 C0 17.5 -4 16.5 -3.5 13',
   ],
   // <0>: o zero bem redondo, com a pupila no meio, vira um olho entre os colchetes
   grimoire: [
