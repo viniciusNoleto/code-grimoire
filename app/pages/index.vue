@@ -70,7 +70,7 @@ useSeoMeta({
             Grimório de código
           </p>
           <p class="mt-2 font-book text-[clamp(.9rem,3vw,1.1rem)] text-gold italic">
-            de Vinícius Nolêto
+            de Vinícius Nolêto de Araújo
           </p>
           <p class="mt-[12%] mb-3 font-book text-[clamp(1.2rem,4vw,1.6rem)] text-foreground">
             Sumário
@@ -103,7 +103,7 @@ useSeoMeta({
                 Grimório de código
               </h1>
               <p class="mt-[5%] mb-0 font-book text-[clamp(1rem,min(3.4vw,2.6svh),1.3rem)] text-gold/85 italic">
-                de Vinícius Nolêto
+                de Vinícius Nolêto de Araújo
               </p>
               <p class="mt-[7%] mb-0 max-w-[24ch] text-[clamp(.8rem,min(2.9vw,2.1svh),.95rem)] leading-[1.45] text-gold/80">
                 A plataforma web, Vue, React, Nuxt, Next.js, SQL, Laravel e Go, estudados por dentro
@@ -161,7 +161,7 @@ useSeoMeta({
             Grimório de código
           </h1>
           <p class="mt-1.5 mb-0 font-book text-[clamp(1.05rem,2vw,1.3rem)] text-gold italic">
-            de Vinícius Nolêto
+            de Vinícius Nolêto de Araújo
           </p>
           <p class="mt-3 mb-0 max-w-[60ch] text-[.95rem] leading-[1.55] text-foreground">
             O que eu estudei de cada framework, para ler do começo ao fim ou consultar no meio do trabalho: {{ tree.length }} tomos, {{ total }} capítulos.
