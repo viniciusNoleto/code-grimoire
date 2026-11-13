@@ -33,28 +33,6 @@ make install           # imagem, npm install no container e sobe em http://local
 2. `make install` (ou `make build && make up`).
 3. No NPM, um Proxy Host: o domínio → scheme `http`, forward hostname `code-grimoire`, porta `3000`. Na aba SSL, peça o certificado Let's Encrypt e ligue *Force SSL*.
 
-Conteúdo novo: basta dar push na `main` (veja CI/CD abaixo). À mão, `git pull && make update-build` compila o site no servidor e troca o container.
-
-### CI/CD (GitHub Actions)
-
-`.github/workflows/ci-cd.yml`:
-
-- **PR ou push**: compila a imagem de produção. Se o build quebrar, o check fica vermelho.
-- **Push na `main`** (ou *Run workflow* na aba Actions): publica a imagem em `ghcr.io/viniciusnoleto/code-grimoire` (tags `latest` e `sha-<commit>`), copia o `docker-compose.production.yml` para o servidor por SSH, baixa a imagem e troca o container.
-
-Secrets do environment `production` (Settings → Environments → production):
-
-| Secret | Valor |
-|---|---|
-| `SSH_HOST` | IP do servidor |
-| `SSH_PORT` | porta do SSH (opcional, padrão 22) |
-| `SSH_USER` | usuário de deploy (no grupo `docker`) |
-| `SSH_PRIVATE_KEY` | chave privada que o Actions usa para entrar |
-| `SSH_KNOWN_HOSTS` | saída de `ssh-keyscan -p <porta> <ip>` |
-| `DEPLOY_PATH` | pasta no servidor com o `.env` (ex.: `/home/deploy/code-grimoire`) |
-
-Rollback: no servidor, `APP_IMAGE=ghcr.io/viniciusnoleto/code-grimoire APP_TAG=sha-<commit-bom> docker compose -f docker-compose.production.yml up -d`.
-
 ## Onde fica cada coisa
 
 ```

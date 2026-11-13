@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Um capítulo em página própria: só o corpo dele é carregado e renderizado.
 import type { ResumeState } from '~/composables/useLastRead'
-import { useEventListener, useThrottleFn } from '@vueuse/core'
+import { useDebounceFn, useEventListener } from '@vueuse/core'
 
 // voltando de "Continuar de onde parei", o próprio capítulo restaura o scroll
 // (a posição vem no history.state); o router não deve levar a página ao topo
@@ -30,7 +30,10 @@ if (!tome || !meta) {
   throw createError({ statusCode: 404, statusMessage: 'Este capítulo não está no grimório', fatal: true })
 }
 
-const { data: doc } = await useAsyncData(`chapter:${meta.path}`, () => queryCollection('grimoire').path(meta.path).first())
+const { data: doc } = await useAsyncData(`chapter:${meta.path}`, async () => {
+  const [found] = await $fetch<any[]>('/api/grimoire/docs', { query: { path: meta.path } })
+  return found ?? null
+})
 const hasSql = computed(() => JSON.stringify(doc.value?.body ?? '').includes('line sql'))
 
 const linkOf = (c?: { path: string }) => (c ? `/${slug}/${slugOf(c.path)}` : undefined)
@@ -39,7 +42,8 @@ const next = tome.chapters[index + 1]
 
 useSeoMeta({ title: `${meta.nav || meta.title} · ${division.value.title}`, description: meta.description })
 
-// ponto de leitura: salvo no cookie last_read enquanto se rola o capítulo
+// ponto de leitura: salvo no cookie last_read quando a rolagem para (medir os títulos
+// e regravar o cookie a cada quadro de rolagem pesava no celular)
 const { save } = useLastRead()
 let reading = false
 const saveReadingPoint = () => {
@@ -47,8 +51,8 @@ const saveReadingPoint = () => {
   if (!reading || !root) return
   save(slug, { chapter: chapterSlug, ...measureReadingPoint(root), at: Date.now() })
 }
-const throttledSave = useThrottleFn(saveReadingPoint, 500, true)
-useEventListener(import.meta.client ? window : undefined, 'scroll', throttledSave, { passive: true })
+const debouncedSave = useDebounceFn(saveReadingPoint, 400, { maxWait: 3000 })
+useEventListener(import.meta.client ? window : undefined, 'scroll', debouncedSave, { passive: true })
 useEventListener(import.meta.client ? window : undefined, 'pagehide', saveReadingPoint)
 
 onMounted(async () => {

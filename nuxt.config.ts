@@ -12,7 +12,7 @@ const grimoireTheme = createCssVariablesTheme({
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-11-01',
-  modules: ['@nuxt/content', '@nuxt/icon', '@nuxt/fonts', '@nuxtjs/color-mode', 'shadcn-nuxt'],
+  modules: ['@nuxt/content', '@nuxt/icon', '@nuxt/fonts', '@nuxtjs/color-mode', 'shadcn-nuxt', '@vite-pwa/nuxt'],
   // Tailwind CSS v4: tokens, variantes e base; o resto são utilitários nos componentes
   css: ['~/assets/css/tailwind.css'],
 
@@ -56,7 +56,10 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'color-scheme', content: 'light dark' },
       ],
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/sigil.svg' }],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/sigil.svg' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon-180x180.png' },
+      ],
       script: [
         // classe .js e preferência de SQL aplicadas antes da primeira pintura (o tema fica com o color-mode)
         {
@@ -78,6 +81,56 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+
+  // PWA: instalável (abre em tela cheia, sem a barra do navegador) e com os
+  // capítulos já lidos disponíveis offline. O site é SSR, então não há página
+  // de fallback: cada endereço vem da rede e, sem rede, do cache.
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Grimório de código',
+      short_name: 'Grimório',
+      description: 'A plataforma web, Vue, React, Nuxt, Next.js, SQL, Laravel e Go estudados por dentro.',
+      lang: 'pt-BR',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      orientation: 'portrait',
+      // a capa do livro: couro e ouro
+      background_color: '#2a1d16',
+      theme_color: '#2a1d16',
+      icons: [
+        { src: '/pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+        { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+        { src: '/maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      ],
+    },
+    generateSW: {
+      navigateFallback: null,
+      globPatterns: ['**/*.{js,css,woff2,svg,png}'],
+      // o SQLite em WASM do Nuxt Content não é usado no navegador (as consultas vão para /api/grimoire)
+      globIgnores: ['**/sqlite3*', '**/*.wasm'],
+      runtimeCaching: [
+        {
+          urlPattern: ({ request }) => request.mode === 'navigate',
+          handler: 'NetworkFirst',
+          options: { cacheName: 'pages', networkTimeoutSeconds: 4, expiration: { maxEntries: 200 } },
+        },
+        {
+          urlPattern: ({ url }) => url.pathname.startsWith('/api/grimoire/') || url.pathname.endsWith('_payload.json'),
+          handler: 'NetworkFirst',
+          options: { cacheName: 'content', networkTimeoutSeconds: 4, expiration: { maxEntries: 300 } },
+        },
+        {
+          urlPattern: ({ url }) => url.pathname === '/search.json',
+          handler: 'StaleWhileRevalidate',
+          options: { cacheName: 'search' },
+        },
+      ],
+    },
+    client: { installPrompt: false },
   },
 
   nitro: {

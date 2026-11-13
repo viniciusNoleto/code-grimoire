@@ -58,7 +58,7 @@ const groupsOf = (chapters: SidebarChapter[]) => groupChapters(chapters)
 
 <template>
   <nav
-    class="sticky top-0 -ml-1.5 max-h-screen self-start overflow-y-auto overscroll-contain pt-7 pr-3.5 pb-6 pl-1.5 [scrollbar-gutter:stable] max-book:hidden"
+    class="sticky top-0 -ml-1.5 max-h-dvh self-start overflow-y-auto overscroll-contain pt-7 pr-3.5 pb-6 pl-1.5 [scrollbar-gutter:stable] max-book:hidden"
     aria-label="Índice"
   >
     <div class="mb-6 flex items-center justify-between gap-2">
@@ -90,7 +90,7 @@ const groupsOf = (chapters: SidebarChapter[]) => groupChapters(chapters)
           @focus="load"
           @keydown="onKeydown"
         />
-        <ul v-if="query.trim()" ref="list" class="mt-1.5 grid max-h-[50vh] gap-px overflow-y-auto rounded-md border border-border bg-card p-1">
+        <ul v-if="query.trim()" ref="list" class="mt-1.5 grid max-h-[50dvh] gap-px overflow-y-auto rounded-md border border-border bg-card p-1">
           <li v-for="(r, i) in results" :key="r.section.id">
             <a
               :href="r.section.id"

@@ -13,7 +13,7 @@ if (!division.value) {
 // só a abertura de cada tomo traz corpo; os capítulos vêm da árvore (metadados)
 const tomePaths = division.value.tomes.map(t => t.path)
 const { data: tomeDocs } = await useAsyncData(`tomes:${slug}`, () =>
-  queryCollection('grimoire').where('path', 'IN', tomePaths).all(),
+  $fetch<any[]>('/api/grimoire/docs', { query: { path: tomePaths } }),
 )
 const tomes = computed(() => division.value!.tomes.map(t => ({
   id: slugOf(t.path),

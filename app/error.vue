@@ -13,7 +13,7 @@ useHead({ bodyAttrs: { class: 'bg-desk' } })
 </script>
 
 <template>
-  <main id="content" class="grid min-h-svh place-items-center px-4">
+  <main id="content" class="grid min-h-dvh place-items-center px-4">
     <div class="paper-grain stacked-pages max-w-lg rounded-[3px_10px_10px_3px] px-10 py-12 text-center">
       <Glyph :ring="true" class="mx-auto mb-6 size-24 text-gold" />
       <p class="font-mono text-[.74rem] tracking-[.14em] text-muted-foreground uppercase">

@@ -56,10 +56,8 @@ export function resolveContentLink(href: string, currentDivision: string, tree: 
 
 export function useTree() {
   return useAsyncData('tree', async () => {
-    const docs = await queryCollection('grimoire')
-      .select('path', 'title', 'description', 'nav', 'group', 'version', 'color', 'colorDark', 'order', 'spell', 'cover', 'stem')
-      .order('stem', 'ASC')
-      .all() as TreeNode[]
+    // consulta no servidor (server/api/grimoire): o navegador não carrega o SQLite do Nuxt Content
+    const docs = await $fetch<TreeNode[]>('/api/grimoire/tree')
     const divisions: Division[] = docs
       .filter(d => segments(d.path).length === 1)
       .map(d => ({ ...d, tomes: [] as Tome[] }))

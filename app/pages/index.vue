@@ -58,10 +58,10 @@ useSeoMeta({
 <template>
   <main id="content">
     <!-- o livro fechado sobre a mesa -->
-    <section v-if="book !== 'open'" class="grid min-h-svh place-items-center overflow-hidden px-4 pt-6 pb-16 perspective-[2200px]" aria-label="Capa">
+    <section v-if="book !== 'open'" class="grid min-h-dvh place-items-center overflow-hidden px-4 pt-6 pb-16 perspective-[2200px]" aria-label="Capa">
       <!-- ao abrir, o livro anda meia largura para a direita: o livro aberto fica centrado -->
       <div
-        class="relative aspect-[5/7] w-[min(440px,calc(100vw-48px),calc((100svh-96px)*5/7))] min-w-[240px] transition-transform duration-[1000ms] ease-book transform-3d"
+        class="relative aspect-[5/7] w-[min(440px,calc(100vw-48px),calc((100dvh-96px)*5/7))] min-w-[240px] transition-transform duration-[1000ms] ease-book transform-3d"
         :class="book === 'opening' ? 'translate-x-1/2' : ''"
       >
         <!-- a primeira folha, embaixo da capa: aparece enquanto a capa gira -->
@@ -99,13 +99,13 @@ useSeoMeta({
 
             <div class="absolute inset-y-[9%] right-[10%] left-[17%] flex flex-col items-center justify-center pb-[12%] text-center">
               <Glyph :weight="1.3" class="mb-[8%] aspect-square w-[40%] max-w-[160px]" />
-              <h1 class="m-0 font-book text-[clamp(1.9rem,min(8vw,6.6svh),3.2rem)] leading-[.98] font-normal tracking-[-.01em] text-balance text-gold">
+              <h1 class="m-0 font-book text-[clamp(1.9rem,min(8vw,6.6dvh),3.2rem)] leading-[.98] font-normal tracking-[-.01em] text-balance text-gold">
                 Grimório de código
               </h1>
-              <p class="mt-[5%] mb-0 font-book text-[clamp(1rem,min(3.4vw,2.6svh),1.3rem)] text-gold/85 italic">
+              <p class="mt-[5%] mb-0 font-book text-[clamp(1rem,min(3.4vw,2.6dvh),1.3rem)] text-gold/85 italic">
                 de Vinícius Nolêto de Araújo
               </p>
-              <p class="mt-[7%] mb-0 max-w-[24ch] text-[clamp(.8rem,min(2.9vw,2.1svh),.95rem)] leading-[1.45] text-gold/80">
+              <p class="mt-[7%] mb-0 max-w-[24ch] text-[clamp(.8rem,min(2.9vw,2.1dvh),.95rem)] leading-[1.45] text-gold/80">
                 A plataforma web, Vue, React, Nuxt, Next.js, SQL, Laravel e Go, estudados por dentro
               </p>
             </div>
